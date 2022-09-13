@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/mvc https://www.springframework.org/schema/mvc/spring-mvc.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!--dispatcherServlet截获所有URL请求-->
+    <mvc:default-servlet-handler/>
+
+    <!--package scanner-->
+    <context:component-scan base-package="com.bjpowernode.crm.web.controller"/>
+    <context:component-scan base-package="com.bjpowernode.crm.settings.web.controller"/>
+    <context:component-scan base-package="com.bjpowernode.crm.workbench.web.controller"/>
+
+    <!--viewResolver-->
+    <bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/pages/"/>
+        <property name="suffix" value=".jsp"/>
+    </bean>
+
+    <!--添加注解驱动，解析ajax的注解。日期注入@DateTimeFormat,解析ajax@ResponseBody都需要此注解驱动-->
+    <mvc:annotation-driven/>
+
+    <!--配置拦截器-->
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <!--映射要拦截的请求，**多层子目录-->
+            <mvc:mapping path="/settings/**"/>
+            <mvc:mapping path="/workbench/**"/>
+            <!--设置放行，排除拦截(优先级高)-->
+            <!--去往登录页-->
+            <mvc:exclude-mapping path="/settings/qx/user/toLogin.do"/>
+            <!--点击登录验证-->
+            <mvc:exclude-mapping path="/settings/qx/user/login.do"/>
+            <!--实施拦截功能的类-->
+            <bean class="com.bjpowernode.crm.settings.web.interceptor.LoginInterceptor"/>
+        </mvc:interceptor>
+    </mvc:interceptors>
+
+    <!-- 配置文件上传解析器 id:必须是multipartResolver-->
+    <!--<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="maxUploadSize" value="#{1024*1024*80}"/>
+        <property name="defaultEncoding" value="utf-8"/>
+    </bean>-->
+
+
+</beans>

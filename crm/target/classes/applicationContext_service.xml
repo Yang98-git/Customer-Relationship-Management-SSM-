@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/aop https://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <!--包扫描-->
+    <context:component-scan base-package="com.bjpowernode.crm.settings.service,com.bjpowernode.crm.workbench.service"/>
+
+    <!--添加事务管理器-->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <!--切记：配置数据源-->
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <!--添加注解事务,用于单个方法使用事务，order优先级局部覆盖事务切面,可不添加-->
+    <tx:annotation-driven order="100" transaction-manager="transactionManager"/>
+
+    <!--配置事务切面-->
+    <tx:advice id="myadvice" transaction-manager="transactionManager">
+        <tx:attributes>
+            <tx:method name="*select*" read-only="true"/>
+            <tx:method name="*find*" read-only="true"/>
+            <tx:method name="*search*" read-only="true"/>
+            <tx:method name="*get*" read-only="true"/>
+
+            <tx:method name="*insert*" propagation="REQUIRED" rollback-for="Exception"/>
+            <tx:method name="*add*" propagation="REQUIRED" rollback-for="Exception"/>
+            <tx:method name="*save*" propagation="REQUIRED" rollback-for="Exception"/>
+            <tx:method name="*set*" propagation="REQUIRED" rollback-for="Exception"/>
+
+            <tx:method name="*update*" propagation="REQUIRED" rollback-for="Exception"/>
+            <tx:method name="*change*" propagation="REQUIRED" rollback-for="Exception"/>
+            <tx:method name="*modify*" propagation="REQUIRED" rollback-for="Exception"/>
+            <tx:method name="*edit*" propagation="REQUIRED" rollback-for="Exception"/>
+
+            <tx:method name="*delete*" propagation="REQUIRED" rollback-for="Exception"/>
+            <tx:method name="*drop*" propagation="REQUIRED" rollback-for="Exception"/>
+            <tx:method name="*remove*" propagation="REQUIRED" rollback-for="Exception"/>
+            <tx:method name="*clear*" propagation="REQUIRED" rollback-for="Exception"/>
+
+            <tx:method name="do*" propagation="REQUIRED" rollback-for="Exception"/>
+
+            <tx:method name="*" propagation="REQUIRED" read-only="true"/>
+        </tx:attributes>
+    </tx:advice>
+
+    <!--配置切入点+绑定-->
+    <aop:config>
+        <!--切入点表达式：指定在哪个包哪个类的哪个方法添加事务，在service层中配置事务-->
+        <aop:pointcut id="mycut" expression="execution(* com.bjpowernode.crm..service.*.*(..))"/>
+        <!--切面和切入点绑定-->
+        <aop:advisor order="1" advice-ref="myadvice" pointcut-ref="mycut"/>
+    </aop:config>
+
+</beans>
