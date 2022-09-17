@@ -7,7 +7,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 <base href="<%=basePath%>">
 <meta charset="UTF-8">
 <link href="jquery/bootstrap_3.3.0/css/bootstrap.min.css" type="text/css" rel="stylesheet" />
-<script type="text/javascript" src="jquery/jquery-3.4.1.min.js"></script>
+<script type="text/javascript" src="jquery/jquery-1.11.1-min.js"></script>
 <script type="text/javascript" src="jquery/bootstrap_3.3.0/js/bootstrap.min.js"></script>
 <script type="text/javascript">
 
@@ -173,7 +173,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
             <li class="liClass"><a href="javascript:void(0);" target="workareaFrame"><span class="glyphicon glyphicon-user"></span> Customers pool</a></li>
             <li class="liClass"><a href="workbench/activity/index.do" target="workareaFrame"><span class="glyphicon glyphicon-play-circle"></span> Market Activities</a></li>
             <li class="liClass"><a href="clue/index.html" target="workareaFrame"><span class="glyphicon glyphicon-search"></span> Clues(potential customers)</a></li>
-            <li class="liClass"><a href="customer/index.html" target="workareaFrame"><span class="glyphicon glyphicon-user"></span> clients</a></li>
+            <li class="liClass"><a href="customer/index.html" target="workareaFrame"><span class="glyphicon glyphicon-user"></span> Clients</a></li>
             <li class="liClass"><a href="contacts/index.html" target="workareaFrame"><span class="glyphicon glyphicon-earphone"></span> Contacts </a></li>
             <li class="liClass"><a href="transaction/index.html" target="workareaFrame"><span class="glyphicon glyphicon-usd"></span> Transactions(opportunities)</a></li>
             <li class="liClass"><a href="visit/index.html" target="workareaFrame"><span class="glyphicon glyphicon-phone-alt"></span> After-Sales Follow Up</a></li>
