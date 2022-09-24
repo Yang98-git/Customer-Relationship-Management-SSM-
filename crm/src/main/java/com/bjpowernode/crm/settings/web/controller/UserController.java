@@ -30,7 +30,7 @@ public class UserController {
      * /WEB-INF/pages/settings/qx/user/toLogin.do
      * 所有的资源文件都在/WEB-INF/pages目录下，所以可省略
      * 最前面的 / 代表应用的根
-     *
+     * / : http://127.0.0.1:8080/crm
      */
     @RequestMapping("/settings/qx/user/toLogin.do")
     public String toLogin(){
@@ -72,11 +72,11 @@ public class UserController {
                 //登录失败，状态被锁定
                 returnObject.setCode(Constants.RETURN_OBJECT_CODE_FAIL);
                 returnObject.setMessage("Login unsuccessful.Your status is locked.");
-            }else if (!user.getAllowIps().contains(request.getRemoteAddr())){ //判断请求的ip地址是否在用户ip地址内
+            }/*else if (!user.getAllowIps().contains(request.getRemoteAddr())){ //判断请求的ip地址是否在用户ip地址内
                 //登录失败，ip地址受限
                 returnObject.setCode(Constants.RETURN_OBJECT_CODE_FAIL);
                 returnObject.setMessage("Login unsuccessful.Restricted IP address.");
-            }else {
+            }*/else {
                 //登录成功
                 returnObject.setCode(Constants.RETURN_OBJECT_CODE_SUCCESS);
                 //把用户保存到session中,页面中从session取出用户名显示

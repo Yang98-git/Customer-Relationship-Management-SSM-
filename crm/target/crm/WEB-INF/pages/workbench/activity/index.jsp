@@ -167,7 +167,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 
 			if (window.confirm("Are sure you want to delete?")) { //确认删除
 				var ids="";
-				$.each(checkedIds, function () {
+				$.each(checkedIds, function () { //批量选择id
 					//this就是obj, DOM对象取value，jQuery取val()
 					ids+="id="+this.value+"&";
 				});
@@ -277,7 +277,6 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 				type:'post',
 				dataType:'json',
 				success:function (data) {
-					alert('aaaaaaaaaaaaa');
 					if (data.code=='1'){
 						//关闭模态窗口
 						$("#editActivityModal").modal("hide");
@@ -293,6 +292,62 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 					pageNo = $("#demo_pag1").bs_pagination('getOption', 'currentPage')
 					queryActivityByConditionForPage(pageNo,pageSize);
 				}
+			});
+		});
+
+		//给批量导出按钮添加单击事件
+		$("#exportActivityAllBtn").click(function () {
+			//发送同步请求
+			window.location.href="workbench/activity/exportAllActivities.do";
+		});
+
+		//给导入按钮添加单击事件
+		$("#importActivityBtn").click(function () {
+			//收集参数
+			var activityFileName = $("#activityFile").val();//这只能获取文件名
+
+			//表单验证，截取string只可后缀.xls文件
+			var suffix = activityFileName.substring(activityFileName.lastIndexOf(".")+1).toLowerCase();
+			if (suffix !== "xls"){
+				alert("Only XLS file!");
+				return;
+			}
+			//文件本身在DOM对象
+			//document.getElementById() 获取DOM对象
+			//jq转dom
+			var activityFile = $("#activityFile")[0].files[0];
+			if(activityFile.size>1024*1024*5){ //文件大小不超过5M
+				alert("Make sure your file size does not exceed 5MB.");
+				return;
+			}
+			//发送异步请求
+			//FormData是ajax提供的接口，相当于java的类，别人写的代码我们调用
+			//可以模拟键值对向后台提交参数，可以提交二进制数据，其他只能字符串数据
+			var formData = new FormData();
+			//参数名要和controller形参一致
+			formData.append("activityFile",activityFile);
+			$.ajax({
+				url:'workbench/activity/importActivity.do',
+				data: formData,
+				processData: false, //是否把参数统一转换成字符串，文件不转字符串
+				contentType: false, //是否默认urlencoded编码
+				type:'post',
+				dataType:'json',
+				success:function (data) {
+					if (data.code=='1'){
+						//提示成功导入记录条数
+						alert(data.retData+" records are successfully imported.")
+						//关闭模态窗口
+						$("#importActivityModal").modal("hide");
+						//刷新市场活动列表，显示第一页，每页显示条数不变
+						pageSize = $("#demo_pag1").bs_pagination('getOption', 'rowsPerPage');
+						queryActivityByConditionForPage(1, pageSize);
+					}else {
+						alert(data.message);
+						$("#importActivityModal").modal("show");
+					}
+				}
+
 			});
 		});
 	});
@@ -332,7 +387,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 					htmlStr+="<tr class='active'>";
 					/*每条市场活动id赋值给checkbox*/
 					htmlStr+="<td><input type='checkbox' value='"+obj.id+"'/></td>";
-					htmlStr+="<td><a style='text-decoration: none; cursor: pointer;' onclick='window.location.href='detail.html';'>"+obj.name+"</a></td>";
+					htmlStr+="<td><a style='text-decoration: none; cursor: pointer;' onclick='window.location.href=\"workbench/activity/detailActivity.do?id="+obj.id+"\";'>"+obj.name+"</a></td>";
 					htmlStr+="<td>"+obj.owner+"</td>";
 					htmlStr+="<td>"+obj.startDate+"</td>";
 					htmlStr+="<td>"+obj.endDate+"</td>";
@@ -526,7 +581,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
                 </div>
                 <div class="modal-body" style="height: 350px;">
                     <div style="position: relative;top: 20px; left: 50px;">
-                        请选择要上传的文件：<small style="color: gray;">[仅支持.xls]</small>
+						Please select the file to upload：<small style="color: gray;">[Only.xls]</small>
                     </div>
                     <div style="position: relative;top: 40px; left: 50px;">
                         <input type="file" id="activityFile">
@@ -534,13 +589,20 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
                     <div style="position: relative; width: 400px; height: 320px; left: 45% ; top: -40px;" >
                         <h3>IMPORTANT</h3>
                         <ul>
-                            <li>操作仅针对Excel，仅支持后缀名为XLS的文件。</li>
+                            <%--<li>操作仅针对Excel，仅支持后缀名为XLS的文件。</li>
                             <li>给定文件的第一行将视为字段名。</li>
                             <li>请确认您的文件大小不超过5MB。</li>
                             <li>日期值以文本形式保存，必须符合yyyy-MM-dd格式。</li>
                             <li>日期时间以文本形式保存，必须符合yyyy-MM-dd HH:mm:ss的格式。</li>
                             <li>默认情况下，字符编码是UTF-8 (统一码)，请确保您导入的文件使用的是正确的字符编码方式。</li>
-                            <li>建议您在导入真实数据之前用测试文件测试文件导入功能。</li>
+                            <li>建议您在导入真实数据之前用测试文件测试文件导入功能。</li>--%>
+							<li>The operation is only for Excel and only supports the suffix called XLS.</li>
+							<li>The first line of a given file is treated as the field name.</li>
+							<li>Make sure your file size does not exceed 5MB.</li>
+							<li>The date value is saved in text format and must be in the format yyyy-MM-dd.</li>
+							<li>The date and time are saved in text format. The format must be yyyy-MM-dd HH:mm:ss.</li>
+							<li>By default, the character encoding is utf-8 (unified code), and make sure that the files you import use are the correct character encoding methods.</li>
+							<li>It is recommended that you test file import functionality before importing real data.</li>
                         </ul>
                     </div>
                 </div>
@@ -624,14 +686,14 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 					<tbody id="tBody">
 						<%--<tr class="active">
 							<td><input type="checkbox" /></td>
-							<td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href='detail.html';">发传单</a></td>
+							<td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href='detail.jsp';">发传单</a></td>
                             <td>zhangsan</td>
 							<td>2020-10-10</td>
 							<td>2020-10-20</td>
 						</tr>
                         <tr class="active">
                             <td><input type="checkbox" /></td>
-                            <td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href='detail.html';">发传单</a></td>
+                            <td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href='detail.jsp';">发传单</a></td>
                             <td>zhangsan</td>
                             <td>2020-10-10</td>
                             <td>2020-10-20</td>
